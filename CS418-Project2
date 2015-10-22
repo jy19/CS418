@@ -1,0 +1,7 @@
+import sys
+
+with open(sys.argv[1]) as fh:
+        dna_list = []
+        for line in fh:
+                if line[0] != ">":
+                        dna_list.append(line.strip())
