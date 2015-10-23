@@ -1,3 +1,6 @@
+//My contig problem (with fasta input adjustment)
+//Unless, do we feel more comfortable using Stanley's code? I could put that up instead
+
 import sys
 
 with open(sys.argv[1]) as fh:
@@ -5,3 +8,46 @@ with open(sys.argv[1]) as fh:
         for line in fh:
                 if line[0] != ">":
                         dna_list.append(line.strip())
+        length = len(dna_list[0])
+
+output = ""
+
+edges = dict()
+for seq in dna_list:
+        if seq[0:length-1] in edges:
+                edges[seq[0:length-1]].append(seq[1:length])
+        else:
+                edges[seq[0:length-1]] = [seq[1:length]]
+
+non_branch_seq = []
+for key in edges:                                       //Tag all non branching nodes
+        if len(edges[key]) == 1:
+                count = 0
+                for key2 in edges:
+                        for node in edges[key2]:
+                                if key == node:
+                                        count = count+1
+                if count == 1:
+                        non_branch_seq.append(key)
+
+def create_config(key,value,edges,non_branch_seq):
+        global output
+        output+=value[-1]                               
+        edges[key].remove(value)
+        if value in non_branch_seq and len(edges[value]) > 0:
+                key = value
+                value = edges[value][0]
+                create_config(key,value,edges,non_branch_seq)
+
+done = False
+while not done:
+        done = True
+        for key in edges:                               //Take a node
+                if key not in non_branch_seq:           //Not starting at non branching node
+                        for value in edges[key]:        //Look at each node it points to
+                                done = False
+                                output+=key             
+                                create_config(key,value,edges,non_branch_seq)
+                                output+=" "
+
+print output
