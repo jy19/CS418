@@ -30,30 +30,28 @@ with open(sys.argv[1]) as fh:
                 if line[0] != ">":
                         dna_list.append(line.strip())
 
-for dna1 in dna_list:                   #Remove duplicates
-        for dna2 in dna_list:
-                if dna1 == dna2 and dna_list.index(dna1) != dna_list.index(dna2):
-                        dna_list.remove(dna2)
-
 i=1
 mismatches = 1
 while(True):
+        initial_dna_list_size = len(dna_list)
         for dna1 in dna_list:
                 for dna2 in dna_list:           #Compare all dna in list
                         count = 0
                         for c in range(shortest_contig_size([dna1[i:],dna2[:len(dna1)-i]])):
                                 if dna1[i:][c] == dna2[:len(dna1)-i][c]:
                                         count+=1
-                        if count >= len(dna1[i:]) - mismatches:
+                        if dna1 == dna2:        #Remove duplicates
+                                if dna_list.index(dna1) != dna_list.index(dna2):
+                                        dna.list.remove(dna2)
+                        elif count >= len(dna1[i:]) - mismatches:
                                 dna_list.append(dna1+dna2[len(dna1)-i:])
                                 dna_list.remove(dna1)
                                 dna_list.remove(dna2)
-                                i=0
                                 break
-                if i==0:                #Start over when change made to list
-                        break
-        if len(dna_list) == 1 or i > longest_contig_size(dna_list):
+        if initial_dna_list_size == len(dna_list) and i == longest_contig_size(dna_list):
                 break                   #End
+        if i == longest_contig_size:
+                i = 0
         i+=1
 
 print "\n".join(dna_list)
@@ -61,6 +59,7 @@ print "Average contig size: " + str(average_contig_size(dna_list))
 print "Number of contigs returned: " + str(len(dna_list))
 print "Shortest contig size: " + str(shortest_contig_size(dna_list))
 print "Largest contig size: " + str(longest_contig_size(dna_list))
+
 
 
 
