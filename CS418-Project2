@@ -26,13 +26,13 @@ with open(sys.argv[1]) as fh:
 i=1
 while(True):
         for dna1 in dna_list:
-                for dna2 in dna_list:                   #Compare each dna strand in dna_list
+                for dna2 in dna_list:                                                   #Compare each dna strand in dna_list
                         if dna1 == dna2:
                                 if dna_list.index(dna1) != dna_list.index(dna2):
                                         dna_list.remove(dna2)
-                        elif dna1[i:] == dna2[:len(dna1)-i]:    #If back of one equals front of another
-                                dna_list.append(dna1+dna2[len(dna1)-i:])        #Join and add to list
-                                dna_list.remove(dna1)                   #Remove original two
+                        elif dna1[i:] == dna2[:len(dna1)-i]:                            #If back of one equals front of another
+                                dna_list.append(dna1+dna2[len(dna1)-i:])                #Join and add to list
+                                dna_list.remove(dna1)                                   #Remove original two
                                 dna_list.remove(dna2)
                                 i=0
                                 break
