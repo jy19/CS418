@@ -1,5 +1,4 @@
-//My contig problem (with fasta input adjustment)
-//Unless, do we feel more comfortable using Stanley's code? I could put that up instead
+#This code seems to get the right answers, it just merges dna that matches, but it doesn't account for errors
 
 import sys
 
@@ -8,46 +7,79 @@ with open(sys.argv[1]) as fh:
         for line in fh:
                 if line[0] != ">":
                         dna_list.append(line.strip())
-        length = len(dna_list[0])
 
-output = ""
+i=1
+while(True):
+        for dna1 in dna_list:
+                for dna2 in dna_list:                   #Compare each dna strand in dna_list
+                        if dna1 == dna2:
+                                i=i #Do nothing
+                        elif dna1[i:] == dna2[:len(dna1)-i]:    #If back of one equals front of another
+                                dna_list.append(dna1+dna2[len(dna1)-i:])        #Join and add to list
+                                dna_list.remove(dna1)                   #Remove original two
+                                dna_list.remove(dna2)
+                                i=0
+                                break
+                if i==0:
+                        break
+        if len(dna_list) == 1 or i == 10000:
+                break
+        i+=1
 
-edges = dict()
-for seq in dna_list:
-        if seq[0:length-1] in edges:
-                edges[seq[0:length-1]].append(seq[1:length])
-        else:
-                edges[seq[0:length-1]] = [seq[1:length]]
+print "\n".join(dna_list)
 
-non_branch_seq = []
-for key in edges:                                       //Tag all non branching nodes
-        if len(edges[key]) == 1:
-                count = 0
-                for key2 in edges:
-                        for node in edges[key2]:
-                                if key == node:
-                                        count = count+1
-                if count == 1:
-                        non_branch_seq.append(key)
 
-def create_config(key,value,edges,non_branch_seq):
-        global output
-        output+=value[-1]                               
-        edges[key].remove(value)
-        if value in non_branch_seq and len(edges[value]) > 0:
-                key = value
-                value = edges[value][0]
-                create_config(key,value,edges,non_branch_seq)
+#My contig problem (with fasta input adjustment)
 
-done = False
-while not done:
-        done = True
-        for key in edges:                               //Take a node
-                if key not in non_branch_seq:           //Not starting at non branching node
-                        for value in edges[key]:        //Look at each node it points to
-                                done = False
-                                output+=key             
-                                create_config(key,value,edges,non_branch_seq)
-                                output+=" "
-
-print output
+#import sys
+#
+#with open(sys.argv[1]) as fh:
+#        dna_list = []
+#        for line in fh:
+#                if line[0] != ">":
+#                        dna_list.append(line.strip())
+#        length = len(dna_list[0])
+#
+#output = ""
+#
+#edges = dict()
+#for seq in dna_list:
+#        if seq[0:length-1] in edges:
+#                edges[seq[0:length-1]].append(seq[1:length])
+#        else:
+#                edges[seq[0:length-1]] = [seq[1:length]]
+#
+#non_branch_seq = []
+#for key in edges:                                       //Tag all non branching nodes
+#        if len(edges[key]) == 1:
+#                count = 0
+#                for key2 in edges:
+#                        for node in edges[key2]:
+#                                if key == node:
+#                                        count = count+1
+#                if count == 1:
+#                        non_branch_seq.append(key)
+#
+#def create_config(key,value,edges,non_branch_seq):
+#        global output
+#        output+=value[-1]                               
+#        edges[key].remove(value)
+#        if value in non_branch_seq and len(edges[value]) > 0:
+#                key = value
+#                value = edges[value][0]
+#                create_config(key,value,edges,non_branch_seq)
+#
+#
+#done = False
+#while not done:
+#        done = True
+#        for key in edges:                               //Take a node
+#                if key not in non_branch_seq:           //Not starting at non branching node
+#                        for value in edges[key]:        //Look at each node it points to
+#                                done = False
+#                                output+=key             
+#                                create_config(key,value,edges,non_branch_seq)
+#                                output+=" "
+#
+#print output
+#
