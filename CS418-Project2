@@ -2,14 +2,14 @@
 
 import sys
 
-def longest_contig(dna_list):
+def longest_contig_size(dna_list):
         longest_contig = ""
         for dna in dna_list:
                 if len(dna) > len(longest_contig):
                         longest_contig = dna
-        return longest_contig
+        return len(longest_contig)
 
-def average_contig(dna_list):
+def average_contig_size(dna_list):
         count = 0
         total_size = 0
         for dna in dna_list:
@@ -38,14 +38,14 @@ while(True):
                                 break
                 if i==0:
                         break
-        if len(dna_list) == 1 or i > len(longest_contig(dna_list)):
+        if len(dna_list) == 1 or i > longest_contig_size(dna_list)):
                 break
         i+=1
 
 print "\n".join(dna_list)
-print "Average contig size: " + str(average_contig(dna_list))
+print "Average contig size: " + str(average_contig_size(dna_list))
 print "Number of contigs returned: " + str(len(dna_list))
-print "Largest contig size: " + str(len(longest_contig(dna_list)))
+print "Largest contig size: " + str(longest_contig_size(dna_list)))
 
 
 
