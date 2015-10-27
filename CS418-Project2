@@ -1,4 +1,4 @@
-#Fixed: This code seems to get the right answers, it just merges dna that matches, and it accounts for one mismatch
+#I am currently working on this. This works on the example data but I don't think it is working on the others
 
 import sys
 
