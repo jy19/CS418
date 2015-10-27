@@ -1,4 +1,4 @@
-#This code seems to get the right answers, it just merges dna that matches, but it doesn't account for errors
+#Fixed: This code seems to get the right answers, it just merges dna that matches, and it accounts for one mismatch
 
 import sys
 
@@ -8,6 +8,13 @@ def longest_contig_size(dna_list):
                 if len(dna) > len(longest_contig):
                         longest_contig = dna
         return len(longest_contig)
+
+def shortest_contig_size(dna_list):
+        shortest_contig = dna_list[0]
+        for dna in dna_list:
+                if len(dna) < len(shortest_contig):
+                        shortest_contig = dna
+        return len(shortest_contig)
 
 def average_contig_size(dna_list):
         count = 0
@@ -23,85 +30,33 @@ with open(sys.argv[1]) as fh:
                 if line[0] != ">":
                         dna_list.append(line.strip())
 
-i=1
+mismatches = 1
+
+i=0
 while(True):
+        initial_dna_list_size = len(dna_list)
         for dna1 in dna_list:
-                for dna2 in dna_list:                                                   #Compare each dna strand in dna_list
-                        if dna1 == dna2:
+                for dna2 in dna_list:           #Compare all dna in list
+                        correct_count = 0
+                        for c in range(shortest_contig_size([dna1[i:],dna2[:len(dna1)-i]])):
+                                if dna1[i:][c] == dna2[:len(dna1)-i][c]:
+                                        correct_count+=1
+                        if dna1 == dna2:        #Remove duplicates
                                 if dna_list.index(dna1) != dna_list.index(dna2):
-                                        dna_list.remove(dna2)
-                        elif dna1[i:] == dna2[:len(dna1)-i]:                            #If back of one equals front of another
-                                dna_list.append(dna1+dna2[len(dna1)-i:])                #Join and add to list
-                                dna_list.remove(dna1)                                   #Remove original two
+                                        dna.list.remove(dna2)
+                        elif correct_count >= len(dna1[i:]) - mismatches:
+                                dna_list.append(dna1+dna2[len(dna1)-i:])
+                                dna_list.remove(dna1)
                                 dna_list.remove(dna2)
-                                i=0
                                 break
-                if i==0:
-                        break
-        if len(dna_list) == 1 or i > longest_contig_size(dna_list):
-                break
+        if initial_dna_list_size == len(dna_list) and i == longest_contig_size(dna_list) - mismatches:
+                break                   #End
+        if i == longest_contig_size(dna_list) - mismatches:
+                i = 0
         i+=1
 
 print "\n".join(dna_list)
 print "Average contig size: " + str(average_contig_size(dna_list))
 print "Number of contigs returned: " + str(len(dna_list))
+print "Shortest contig size: " + str(shortest_contig_size(dna_list))
 print "Largest contig size: " + str(longest_contig_size(dna_list))
-
-
-
-
-
-#My contig problem (with fasta input adjustment)
-
-#import sys
-#
-#with open(sys.argv[1]) as fh:
-#        dna_list = []
-#        for line in fh:
-#                if line[0] != ">":
-#                        dna_list.append(line.strip())
-#        length = len(dna_list[0])
-#
-#output = ""
-#
-#edges = dict()
-#for seq in dna_list:
-#        if seq[0:length-1] in edges:
-#                edges[seq[0:length-1]].append(seq[1:length])
-#        else:
-#                edges[seq[0:length-1]] = [seq[1:length]]
-#
-#non_branch_seq = []
-#for key in edges:                                       //Tag all non branching nodes
-#        if len(edges[key]) == 1:
-#                count = 0
-#                for key2 in edges:
-#                        for node in edges[key2]:
-#                                if key == node:
-#                                        count = count+1
-#                if count == 1:
-#                        non_branch_seq.append(key)
-#
-#def create_config(key,value,edges,non_branch_seq):
-#        global output
-#        output+=value[-1]                               
-#        edges[key].remove(value)
-#        if value in non_branch_seq and len(edges[value]) > 0:
-#                key = value
-#                value = edges[value][0]
-#                create_config(key,value,edges,non_branch_seq)
-#
-#
-#done = False
-#while not done:
-#        done = True
-#        for key in edges:                               //Take a node
-#                if key not in non_branch_seq:           //Not starting at non branching node
-#                        for value in edges[key]:        //Look at each node it points to
-#                                done = False
-#                                output+=key             
-#                                create_config(key,value,edges,non_branch_seq)
-#                                output+=" "
-#
-#print output
-#
