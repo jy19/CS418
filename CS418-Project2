@@ -1,4 +1,4 @@
-#I am currently working on this. This works on the example data but I don't think it is working on the others
+#This code seems to get the right answers, it just merges dna that matches, but it doesn't account for errors
 
 import sys
 
@@ -8,13 +8,6 @@ def longest_contig_size(dna_list):
                 if len(dna) > len(longest_contig):
                         longest_contig = dna
         return len(longest_contig)
-
-def shortest_contig_size(dna_list):
-        shortest_contig = dna_list[0]
-        for dna in dna_list:
-                if len(dna) < len(shortest_contig):
-                        shortest_contig = dna
-        return len(shortest_contig)
 
 def average_contig_size(dna_list):
         count = 0
@@ -30,33 +23,26 @@ with open(sys.argv[1]) as fh:
                 if line[0] != ">":
                         dna_list.append(line.strip())
 
-mismatches = 1
-
-i=0
+i=1
 while(True):
-        initial_dna_list_size = len(dna_list)
         for dna1 in dna_list:
-                for dna2 in dna_list:           #Compare all dna in list
-                        correct_count = 0
-                        for c in range(shortest_contig_size([dna1[i:],dna2[:len(dna1)-i]])):
-                                if dna1[i:][c] == dna2[:len(dna1)-i][c]:
-                                        correct_count+=1
-                        if dna1 == dna2:        #Remove duplicates
+                for dna2 in dna_list:                                                   #Compare each dna strand in dna_list
+                        if dna1 == dna2:
                                 if dna_list.index(dna1) != dna_list.index(dna2):
-                                        dna.list.remove(dna2)
-                        elif correct_count >= len(dna1[i:]) - mismatches:
-                                dna_list.append(dna1+dna2[len(dna1)-i:])
-                                dna_list.remove(dna1)
+                                        dna_list.remove(dna2)
+                        elif dna1[i:] == dna2[:len(dna1)-i]:                            #If back of one equals front of another
+                                dna_list.append(dna1+dna2[len(dna1)-i:])                #Join and add to list
+                                dna_list.remove(dna1)                                   #Remove original two
                                 dna_list.remove(dna2)
+                                i=0
                                 break
-        if initial_dna_list_size == len(dna_list) and i == longest_contig_size(dna_list) - mismatches:
-                break                   #End
-        if i == longest_contig_size(dna_list) - mismatches:
-                i = 0
+                if i==0:
+                        break
+        if len(dna_list) == 1 or i > longest_contig_size(dna_list):
+                break
         i+=1
 
 print "\n".join(dna_list)
 print "Average contig size: " + str(average_contig_size(dna_list))
 print "Number of contigs returned: " + str(len(dna_list))
-print "Shortest contig size: " + str(shortest_contig_size(dna_list))
 print "Largest contig size: " + str(longest_contig_size(dna_list))
