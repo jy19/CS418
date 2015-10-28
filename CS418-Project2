@@ -51,7 +51,7 @@ while(len(dna_list) != 1 and initial_dna_list_size != len(dna_list)):
                         dna_list2.append(dna1)
         dna_list = dna_list2
 
-        initial_dna_list_size = len(dna_list)
+        initial_dna_list_size = len(dna_list)                   #Prepends or appends dna on another dna
         print len(dna_list)
         for i in range(longest_contig_size(dna_list)):
                 for dna1 in dna_list:
