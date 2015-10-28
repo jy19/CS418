@@ -1,4 +1,4 @@
-#This code seems to be working and it accounts for one mismatch.
+#This code works but it will take forever on the large datasets
 
 import sys
 
@@ -32,38 +32,56 @@ with open(sys.argv[1]) as fh:
 
 mismatches = 1
 
-i=0
-while(True):
-        initial_dna_list_size = len(dna_list)
+initial_dna_list_size = 0
+while(len(dna_list) != 1 and initial_dna_list_size != len(dna_list)):
+        dna_list2 = []                  #Remove any dna within another
         for dna1 in dna_list:
-                for dna2 in dna_list:           #Compare all dna in list
+                within = False
+                for dna2 in dna_list:
                         if len(dna1) <= len(dna2) and dna1 != dna2:
-                                correct_prepend_count = 0
-                                correct_append_count = 0
-                                for c in range(len(dna1)-i):
-                                        if dna1[i:][c] == dna2[c]:
-                                                correct_prepend_count += 1
-                                        if dna1[:len(dna1)-i][c] == dna2[len(dna2)-len(dna1)+i:][c]:
-                                                correct_append_count += 1
-                                if correct_prepend_count >= len(dna1[i:]) - mismatches:
-                                        dna_list.append(dna1+dna2[len(dna1)-i:])
-                                        dna_list.remove(dna1)
-                                        dna_list.remove(dna2)
-                                        break
-                                elif correct_append_count >= len(dna1[i:]) - mismatches:
-                                        dna_list.append(dna2+dna1[len(dna1)-i:])
-                                        dna_list.remove(dna1)
-                                        dna_list.remove(dna2)
-                                        break
-        i+=1
-        if i == len(dna1) - mismatches:
-                if initial_dna_list_size == len(dna_list):
+                                for i in range(len(dna2)-len(dna1)):
+                                        correct_count = 0
+                                        for c in range(len(dna1)):
+                                                if dna1[c] == dna2[i:][c]:
+                                                        correct_count += 1
+                                        if correct_count >= len(dna1) - mismatches:
+                                                within = True
+                                                break
+                if within == False:
+                        dna_list2.append(dna1)
+        dna_list = dna_list2
+
+        initial_dna_list_size = len(dna_list)
+        print len(dna_list)
+        for i in range(longest_contig_size(dna_list)):
+                for dna1 in dna_list:
+                        for dna2 in dna_list:
+                                if len(dna1) <= len(dna2) and i < len(dna1) and dna1 != dna2:
+                                        correct_prepend_count = 0
+                                        correct_append_count = 0
+                                        for c in range(len(dna1)-i):
+                                                if dna1[i:][c] == dna2[c]:
+                                                        correct_prepend_count += 1
+                                                if dna1[:len(dna1)-i][c] == dna2[len(dna2)-len(dna1)+i:][c]:
+                                                        correct_append_count += 1
+                                        if correct_prepend_count >= len(dna1[i:]) - mismatches:
+                                                dna_list.append(dna1+dna2[len(dna1)-i:])
+                                                dna_list.remove(dna1)
+                                                dna_list.remove(dna2)
+                                                break
+                                        elif correct_append_count >= len(dna1[i:]) - mismatches:
+                                                dna_list.append(dna2+dna1[len(dna1)-i:])
+                                                dna_list.remove(dna1)
+                                                dna_list.remove(dna2)
+                                                break
+                        if initial_dna_list_size != len(dna_list):
+                                break
+                if initial_dna_list_size != len(dna_list):
                         break
-                i=0
+
 
 print "\n".join(dna_list)
 print "Average contig size: " + str(average_contig_size(dna_list))
 print "Number of contigs returned: " + str(len(dna_list))
-print "Shortest contig size: " + str(shortest_contig_size(dna_list))
 print "Largest contig size: " + str(longest_contig_size(dna_list))
-
+print "Shortest contig size: " + str(shortest_contig_size(dna_list))
