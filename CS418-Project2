@@ -34,23 +34,6 @@ mismatches = 1
 
 initial_dna_list_size = 0
 while(len(dna_list) != 1 and initial_dna_list_size != len(dna_list)):
-        dna_list2 = []                  #Remove any dna within another
-        for dna1 in dna_list:
-                within = False
-                for dna2 in dna_list:
-                        if len(dna1) <= len(dna2) and dna1 != dna2:
-                                for i in range(len(dna2)-len(dna1)):
-                                        correct_count = 0
-                                        for c in range(len(dna1)):
-                                                if dna1[c] == dna2[i:][c]:
-                                                        correct_count += 1
-                                        if correct_count >= len(dna1) - mismatches:
-                                                within = True
-                                                break
-                if within == False:
-                        dna_list2.append(dna1)
-        dna_list = dna_list2
-
         initial_dna_list_size = len(dna_list)                   #Prepends or appends dna on another dna
         print len(dna_list)
         for i in range(longest_contig_size(dna_list)):
