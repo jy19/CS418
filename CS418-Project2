@@ -1,7 +1,69 @@
+#This code works but it will take forever on the large datasets
+
 import sys
 
+def longest_contig_size(dna_set):
+        longest_contig = ""
+        for dna in dna_set:
+                if len(dna) > len(longest_contig):
+                        longest_contig = dna
+        return len(longest_contig)
+
+def shortest_contig_size(dna_set):
+        shortest_contig = dna_set.
+        for dna in dna_set:
+                if len(dna) < len(shortest_contig):
+                        shortest_contig = dna
+        return len(shortest_contig)
+
+def average_contig_size(dna_set):
+        count = 0
+        total_size = 0
+        for dna in dna_set:
+                count+=1
+                total_size += len(dna)
+        return total_size/count
+
 with open(sys.argv[1]) as fh:
-        dna_list = []
+        dna_set = set()
         for line in fh:
                 if line[0] != ">":
-                        dna_list.append(line.strip())
+                        dna_set.add(line.strip())
+
+mismatches = 1
+
+initial_dna_set_size = 0
+while(len(dna_set) != 1 and initial_dna_set_size != len(dna_set)):
+        initial_dna_set_size = len(dna_set)             #Prepends or Appends dna on another dna
+        print len(dna_set)
+        for i in range(longest_contig_size(dna_set)):
+                for dna1 in dna_set:
+                        for dna2 in dna_set:
+                                if len(dna1) <= len(dna2) and i < len(dna1) and dna1 != dna2:
+                                        correct_prepend_count = 0
+                                        correct_append_count = 0
+                                        for c in range(len(dna1)-i):
+                                                if dna1[i:][c] == dna2[c]:
+                                                        correct_prepend_count += 1
+                                                if dna1[:len(dna1)-i][c] == dna2[len(dna2)-len(dna1)+i:][c]:
+                                                        correct_append_count += 1
+                                        if correct_prepend_count >= len(dna1[i:]) - mismatches:
+                                                dna_set.add(dna1+dna2[len(dna1)-i:])
+                                                dna_set.remove(dna1)
+                                                dna_set.remove(dna2)
+                                                break
+                                        elif correct_append_count >= len(dna1[i:]) - mismatches:
+                                                dna_set.add(dna2+dna1[len(dna1)-i:])
+                                                dna_set.remove(dna1)
+                                                dna_set.remove(dna2)
+                                                break
+                        if initial_dna_set_size != len(dna_set):
+                                break
+                if initial_dna_set_size != len(dna_set):
+                        break
+
+print "\n".join(dna_set)
+print "Average contig size: " + str(average_contig_size(dna_set))
+print "Number of contigs returned: " + str(len(dna_set))
+print "Largest contig size: " + str(longest_contig_size(dna_set))
+print "Shortest contig size: " + str(shortest_contig_size(dna_set))
