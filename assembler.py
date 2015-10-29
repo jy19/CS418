@@ -87,32 +87,38 @@ def generate_contigs(counts, graph):
         contigs.append(c)
     return contigs
 
+# def get_contigs(reads, k):
+#     pass
+
+
 if __name__ == '__main__':
-    k = int(sys.argv[2])
+    # k = int(sys.argv[2])
+    start, end = map(int, sys.argv[2].split('-'))
     reads = []
-    # for line in sys.stdin:
-    #     kmers.append(line.strip())
     with open(sys.argv[1]) as fh:
         for line in fh:
             if line[0] != '>':
                 reads.append(line.strip())
+    for k in range(start, end):
+        kmers = []
+        for read in reads:
+            kmers.extend(generate_kmers(read, k))
+        # todo error checking
+        try:
+            error_threshold = int(sys.argv[3])
+            kmers = handle_errors(kmers, error_threshold)
+        except IndexError:
+            kmers = list(set(kmers))
+        edge_count = 0
+        graph, counts, edge_count = init_graph(kmers)
 
-    kmers = []
-    for read in reads:
-        kmers.extend(generate_kmers(read, k))
-    # todo error checking
-    if sys.argv[3]:
-        error_threshold = int(sys.argv[3])
-        kmers = handle_errors(kmers, error_threshold)
-    else:
-        kmers = list(set(kmers))
-    graph, counts, edge_count = init_graph(kmers)
+        contigs = generate_contigs(counts, graph)
+        contigs = [merge_nodes(contig) for contig in contigs]
 
-    contigs = generate_contigs(counts, graph)
-    contigs = [merge_nodes(contig) for contig in contigs]
-
-    # print '\n'.join(contig for contig in sorted(contigs))
-    contig_info = get_contig_info(contigs)
-    print 'Longest contig: {0}\nLength: {1}'.format(contig_info['longest'], len(contig_info['longest']))
-    print 'Shortest contig: {0}\nLength: {1}'.format(contig_info['shortest'], len(contig_info['shortest']))
-    print 'Average contig length: {0}'.format(contig_info['avg'])
+        # print '\n'.join(contig for contig in sorted(contigs))
+        contig_info = get_contig_info(contigs)
+        print 'Kmer size: {0}'.format(k)
+        print 'Longest contig: {0}\nLength: {1}'.format(contig_info['longest'], len(contig_info['longest']))
+        print 'Shortest contig: {0}\nLength: {1}'.format(contig_info['shortest'], len(contig_info['shortest']))
+        print 'Average contig length: {0}'.format(contig_info['avg'])
+        print 'Contigs: {0}\n'.format(len(contigs))

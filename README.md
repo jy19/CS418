@@ -2,6 +2,9 @@ To run the code for datasets without errors:
 
     python assembler.py input_file kmer_size
 
+`kmer_size` is a range of values, so it can run multiple kmer size at once.
+It should be formatted like `start-end`.
+
 To run the code for datasets with errors:
 
     python assembler.py input_file kmer_size error_threshold

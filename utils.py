@@ -14,7 +14,7 @@ def handle_errors(kmers, threshold):
     kmer_counts = dict(Counter(kmers))
     filtered_kmers = []
     for k, v in kmer_counts.iteritems():
-        if v < threshold:
+        if v <= threshold:
             continue
         filtered_kmers.append(k)
     return filtered_kmers
