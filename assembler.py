@@ -1,7 +1,10 @@
 import sys
-from utils import generate_kmers
+from utils import generate_kmers, handle_errors, get_contig_info
 
-def init_graph(kmers, edge_count, graph, counts):
+def init_graph(kmers):
+    graph = dict()
+    counts = dict()
+    edge_count = 0
     for kmer in kmers:
         # print kmer
         left = kmer[: -1]
@@ -97,20 +100,19 @@ if __name__ == '__main__':
     kmers = []
     for read in reads:
         kmers.extend(generate_kmers(read, k))
-    kmers = list(set(kmers))
-    graph = dict()
-    counts = dict()
-    edge_count = 0
-    graph, counts, edge_count = init_graph(kmers, edge_count, graph, counts)
+    # todo error checking
+    if sys.argv[3]:
+        error_threshold = int(sys.argv[3])
+        kmers = handle_errors(kmers, error_threshold)
+    else:
+        kmers = list(set(kmers))
+    graph, counts, edge_count = init_graph(kmers)
 
     contigs = generate_contigs(counts, graph)
     contigs = [merge_nodes(contig) for contig in contigs]
 
-    # graph = dict()
-    # counts = dict()
-    # edge_count = 0
-    # graph, counts, edge_count = init_graph(contigs, edge_count, graph, counts)
-    # contigs2 = generate_contigs(counts, graph)
-    # contigs2 = [merge_nodes(contig) for contig in contigs2]
-    # print '\n'.join(contig for contig in sorted(contigs2))
-    print '\n'.join(contig for contig in sorted(contigs))
+    # print '\n'.join(contig for contig in sorted(contigs))
+    contig_info = get_contig_info(contigs)
+    print 'Longest contig: {0}\nLength: {1}'.format(contig_info['longest'], len(contig_info['longest']))
+    print 'Shortest contig: {0}\nLength: {1}'.format(contig_info['shortest'], len(contig_info['shortest']))
+    print 'Average contig length: {0}'.format(contig_info['avg'])
