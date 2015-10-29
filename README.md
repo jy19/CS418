@@ -1,7 +1,4 @@
-To activate the virtual environment:
+To run the code:
 
-    source env/bin/activate
+    python assembler.py input_file kmer_size
 
-To deactivate:
-
-    deactive
