@@ -31,23 +31,27 @@ def build_graph(start, g, non_branching):
     global edge_count
     path = [start]
     cur_node = start
-
+    # print g
     while len(cur_node) > 0:
-        next_node = g[cur_node][0]
-        del g[cur_node][0]
-        # if len( g[ cur_node ] ) == 0:
-        #    del g[ cur_node ]
+        try:
+            next_node = g[cur_node][0]
+            del g[cur_node][0]
+            # if len( g[ cur_node ] ) == 0:
+            #    del g[ cur_node ]
 
-        edge_count -= 1
+            edge_count -= 1
 
-        # print cur_node
-        if next_node in non_branching:
-            # print "non branching:", cur_node
-            path.append(next_node)
-            cur_node = next_node
-            continue
-        else:
-            path.append(next_node)
+            # print cur_node
+            if next_node in non_branching:
+                # print "non branching:", cur_node
+                path.append(next_node)
+                cur_node = next_node
+                continue
+            else:
+                path.append(next_node)
+                break
+        except IndexError:
+            edge_count -=1
             break
 
     return path
