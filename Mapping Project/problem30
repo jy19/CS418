@@ -1,0 +1,58 @@
+import sys
+import collections
+
+with open(sys.argv[1]) as fh:
+	dna = fh.next().strip()
+	dna += '$'
+	patterns = []
+	for pattern in fh:
+		patterns.append(pattern.strip())
+	pattern_length = len(patterns[0])
+
+dna_and_pos = collections.OrderedDict()
+for i in range(len(dna)):
+	dna_and_pos.setdefault(dna[i:]+dna[:i],i)
+
+first_and_SA = collections.OrderedDict()
+sorted = sorted(dna_and_pos)
+first = ""
+for s in sorted:
+	first_and_SA.setdefault(s,dna_and_pos[s])
+	first += s[0]
+
+BWT_and_LtoF = collections.OrderedDict()
+BWT = ""
+for sort in first_and_SA.keys():
+	seq = sort[len(sort)-1] + sort[:len(sort)-1]
+	BWT += seq[0]
+	LtoF = first_and_SA.keys().index(seq)
+	BWT_and_LtoF[seq] = LtoF
+
+#Lists:
+dna
+pos = dna_and_pos.values()
+first
+SA = first_and_SA.values()
+BWT
+LtoF = BWT_and_LtoF.values()
+
+starting_positions = []
+#for i in range(len(dna)):
+#        for pattern in patterns:
+#                if pattern == dna[i:pattern_length+i]:
+#                        starting_positions.append(str(i))
+
+for pattern in patterns:
+	list = SA
+	for c in reversed(range(len(pattern))):
+		if c == 0:
+			break
+		temp_list = []
+		for i in list:
+			if first[i] == pattern[c] and BWT[i] == pattern[c-1]:
+				temp_list.append(LtoF[i])
+		list = temp_list
+	for i in list:
+		starting_positions.append(SA[i])
+
+print starting_positions
