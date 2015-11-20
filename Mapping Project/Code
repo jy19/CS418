@@ -3,7 +3,7 @@ import collections
 
 with open(sys.argv[1]) as genome_fasta:
         genome_fasta.next()
-        dna = genome_fasta.next().strip()
+        dna = genome_fasta.next().strip().lower()
         dna += '$'
 
 with open(sys.argv[2]) as read_fasta:
@@ -13,7 +13,7 @@ with open(sys.argv[2]) as read_fasta:
                 if pattern[0] == ">":
                         pattern_names.append(pattern.strip())
                 else:
-                        patterns.append(pattern.strip())
+                        patterns.append(pattern.strip().lower())
 
 #Make the lists
 
@@ -58,7 +58,7 @@ for pattern in patterns:
                         if first[i] == pattern[c] and BWT[i] == pattern[c-1]:
                                 temp_list.append(LtoF[i])
                 list = temp_list
-        for i in list: 
+        for i in list:
                 starting_positions.append(SA[i])
-                
+
 print starting_positions
