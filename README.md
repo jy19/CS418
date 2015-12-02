@@ -16,3 +16,8 @@ Try different `error_threshold` values to see if longest contig length changes.
 To output to a file for easier reading, pipe stdout to file:
 
     python assembler.py input_file kmer_size [error_threshold] > output_file
+
+To run the mapping project:
+
+    python mapper.py genome_file patterns_file
+
