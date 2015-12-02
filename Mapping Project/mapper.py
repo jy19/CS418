@@ -70,24 +70,24 @@ def create_subscripts(text):
     return subscripted_text
 
 if __name__ == '__main__':
-    # with open(sys.argv[1]) as genome_fasta:
-    #     genome_fasta.next()
-    #     dna = ""
-    #     for line in genome_fasta:
-    #         dna = line.strip().upper()
-    #     dna += '$'
-    #
-    # with open(sys.argv[2]) as read_fasta:
-    #     pattern_names = []
-    #     patterns = []
-    #     for pattern in read_fasta:
-    #         if pattern[0] == ">":
-    #             pattern_names.append(pattern.strip())
-    #         else:
-    #             patterns.append(pattern.strip().lower())
+    with open(sys.argv[1]) as genome_fasta:
+        genome_fasta.next()
+        dna = ""
+        for line in genome_fasta:
+            dna = line.strip().upper()
+        dna += '$'
 
-    dna = 'CGTGATGCGCGGAC$'
-    patterns = ['ATG', 'CGT']
+    with open(sys.argv[2]) as read_fasta:
+        pattern_names = []
+        patterns = []
+        for pattern in read_fasta:
+            if pattern[0] == ">":
+                pattern_names.append(pattern.strip())
+            else:
+                patterns.append(pattern.strip().lower())
+
+    # dna = 'CGTGATGCGCGGAC$'
+    # patterns = ['GCG']
 
     mapper = Mapper(dna)
     positions = []
