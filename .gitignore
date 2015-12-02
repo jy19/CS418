@@ -1,6 +1,7 @@
 *.pyc
 .idea/
 *.swp
-*.fasta
+*.fa*
 contig*
 env/
+
