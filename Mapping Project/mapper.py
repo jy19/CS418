@@ -62,7 +62,9 @@ def create_subscripts(text):
 if __name__ == '__main__':
     with open(sys.argv[1]) as genome_fasta:
         genome_fasta.next()
-        dna = genome_fasta.next().strip().lower()
+        dna = ""
+        for line in genome_fasta:
+            dna = line.strip().lower()
         dna += '$'
 
     with open(sys.argv[2]) as read_fasta:
