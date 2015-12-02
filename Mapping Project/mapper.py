@@ -84,7 +84,7 @@ if __name__ == '__main__':
             if pattern[0] == ">":
                 pattern_names.append(pattern.strip())
             else:
-                patterns.append(pattern.strip().lower())
+                patterns.append(pattern.strip().upper())
 
     # dna = 'CGTGATGCGCGGAC$'
     # patterns = ['GCG']
