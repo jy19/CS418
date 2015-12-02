@@ -13,7 +13,6 @@ class Mapper:
 
     def init_self(self):
         """initializes lists needed for mapping"""
-        print 'init self'
         for c in self.dna:
             self.suffix_tree.add_char(c)
         root = self.suffix_tree.nodes[self.suffix_tree.root]
@@ -36,9 +35,16 @@ class Mapper:
             except KeyError:
                 pass
 
-    def map(self):
-        pass
-
+    def map(self, pattern):
+        found_positions = []
+        for i in range(len(pattern) - 1, 0, -1):
+            # look in first col for pos
+            # use pos to look in bwt for next char
+            # get values of next char in ltof in given pos
+            # look for next char in bwt
+            pass
+        # after last char, push every position in SA to found_positions
+        return found_positions
 
 def create_subscripts(text):
     """helper to append indices (subscripts) to a list of characters (text)"""
@@ -54,22 +60,22 @@ def create_subscripts(text):
     return subscripted_text
 
 if __name__ == '__main__':
-    # with open(sys.argv[1]) as genome_fasta:
-    #     genome_fasta.next()
-    #     dna = genome_fasta.next().strip().lower()
-    #     dna += '$'
-    #
-    # with open(sys.argv[2]) as read_fasta:
-    #     pattern_names = []
-    #     patterns = []
-    #     for pattern in read_fasta:
-    #         if pattern[0] == ">":
-    #             pattern_names.append(pattern.strip())
-    #         else:
-    #             patterns.append(pattern.strip().lower())
+    with open(sys.argv[1]) as genome_fasta:
+        genome_fasta.next()
+        dna = genome_fasta.next().strip().lower()
+        dna += '$'
 
-    dna = 'CGTGATGCGCGGAC$'
+    with open(sys.argv[2]) as read_fasta:
+        pattern_names = []
+        patterns = []
+        for pattern in read_fasta:
+            if pattern[0] == ">":
+                pattern_names.append(pattern.strip())
+            else:
+                patterns.append(pattern.strip().lower())
+
+    # dna = 'CGTGATGCGCGGAC$'
 
     mapper = Mapper(dna)
-    print mapper.suffix_array
-    print mapper.first_col, mapper.bwt, mapper.ltof
+    for pattern in patterns:
+        positions = mapper.map(pattern)
