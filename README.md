@@ -19,5 +19,9 @@ To output to a file for easier reading, pipe stdout to file:
 
 To run the mapping project:
 
-    python mapper.py genome_file patterns_file
+    python mapper.py genome_file reads_file
+
+To output to a SAM file to use with samtools:
+
+    python mapper.py genome_file reads_file > file_name.sam
 

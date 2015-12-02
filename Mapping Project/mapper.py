@@ -69,9 +69,14 @@ def create_subscripts(text):
         subscripted_text.append('{0}-{1}'.format(text[i], subscripts[text[i]]))
     return subscripted_text
 
+def output_to_SAM(position, pattern, pattern_name, genome_name):
+    entry = '{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}'.format(
+        pattern_name, 0, genome_name, position, 255, str(len(pattern)) + 'M', '*', 0, 0, pattern.lower(), '*')
+    print entry
+
 if __name__ == '__main__':
     with open(sys.argv[1]) as genome_fasta:
-        genome_fasta.next()
+        genome_name = genome_fasta.next().strip()[1:]
         dna = ""
         for line in genome_fasta:
             dna = line.strip().upper()
@@ -82,7 +87,7 @@ if __name__ == '__main__':
         patterns = []
         for pattern in read_fasta:
             if pattern[0] == ">":
-                pattern_names.append(pattern.strip())
+                pattern_names.append(pattern.strip()[1:])
             else:
                 patterns.append(pattern.strip().upper())
 
@@ -90,8 +95,12 @@ if __name__ == '__main__':
     # patterns = ['GCG']
 
     mapper = Mapper(dna)
-    positions = []
-    for pattern in patterns:
-        positions.extend(mapper.map(pattern))
+    # positions = []
+    for i in range(len(patterns)):
+        positions = mapper.map(patterns[i])
+        positions = [x+1 for x in positions]
+        output_to_SAM(positions[0], patterns[i], pattern_names[i], genome_name)
+        # positions.extend(mapper.map(pattern))
 
-    print positions
+    # positions = [x+1 for x in positions]
+    # print positions
