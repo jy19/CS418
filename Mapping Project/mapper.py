@@ -37,13 +37,20 @@ class Mapper:
 
     def map(self, pattern):
         found_positions = []
+        current_positions = self.suffix_array
         for i in range(len(pattern) - 1, 0, -1):
             # look in first col for pos
             # use pos to look in bwt for next char
             # get values of next char in ltof in given pos
             # look for next char in bwt
-            pass
+            new_positions = []
+            for j in current_positions:
+                if self.first_col[j] == pattern[i] and self.bwt[j] == pattern[i-1]:
+                    new_positions.append(self.ltof[j])
+            current_positions = new_positions
         # after last char, push every position in SA to found_positions
+        for i in current_positions:
+            found_positions.append(self.suffix_array[i])
         return found_positions
 
 def create_subscripts(text):
@@ -79,5 +86,6 @@ if __name__ == '__main__':
     # dna = 'CGTGATGCGCGGAC$'
 
     mapper = Mapper(dna)
+    positions = []
     for pattern in patterns:
-        positions = mapper.map(pattern)
+        positions.extend(mapper.map(pattern))
