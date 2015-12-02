@@ -1,32 +1,44 @@
 import sys
 from suffixtree import SuffixTree
 
-def traverse_tree(node, char_depth, suffix_tree, suffix_array):
-    """traverse the tree recursively to generate suffix array"""
-    if not node.edges:
-        suffix_array.append(node.start - char_depth - 1)
-        return
-    chars = ['$', 'A', 'C', 'G', 'T']
-    for char in chars:
-        try:
-            next_node = suffix_tree.nodes[node.edges[char]]
-            new_depth = char_depth + (node.end - node.start)
-            traverse_tree(next_node, new_depth, suffix_tree, suffix_array)
-        except KeyError:
-            pass
+class Mapper:
+    def __init__(self, dna):
+        self.dna = dna
+        self.suffix_tree = SuffixTree(len(dna))
+        self.suffix_array = []
+        self.first_col = []
+        self.bwt = []
+        self.ltof = []
+        self.init_self()
 
-def create_suffix_array(suffix_tree):
-    suffix_array = []
-    root = suffix_tree.nodes[suffix_tree.root]
-    traverse_tree(root, root.start, suffix_tree, suffix_array)
-    return suffix_array
+    def init_self(self):
+        """initializes lists needed for mapping"""
+        print 'init self'
+        for c in self.dna:
+            self.suffix_tree.add_char(c)
+        root = self.suffix_tree.nodes[self.suffix_tree.root]
+        self.traverse_tree(root, root.start)
+        self.first_col = create_subscripts([self.dna[x] for x in self.suffix_array])
+        self.bwt = create_subscripts([self.dna[x - 1] if x > 0 else self.dna[-1] for x in self.suffix_array])
+        self.ltof = [self.first_col.index(x) for x in self.bwt]
 
-def create_matrices(dna, suffix_array):
-    """create the other lists from SA needed to do mapping"""
-    first_col = create_subscripts([dna[x] for x in suffix_array])
-    bwt = create_subscripts([dna[x - 1] if x > 0 else dna[-1] for x in suffix_array])
-    ltof = [first_col.index(x) for x in bwt]
-    return bwt, first_col, ltof
+    def traverse_tree(self, node, char_depth):
+        """traverse the tree recursively to generate suffix array"""
+        if not node.edges:
+            self.suffix_array.append(node.start - char_depth - 1)
+            return
+        chars = ['$', 'A', 'C', 'G', 'T']
+        for char in chars:
+            try:
+                next_node = self.suffix_tree.nodes[node.edges[char]]
+                new_depth = char_depth + (node.end - node.start)
+                self.traverse_tree(next_node, new_depth)
+            except KeyError:
+                pass
+
+    def map(self):
+        pass
+
 
 def create_subscripts(text):
     """helper to append indices (subscripts) to a list of characters (text)"""
@@ -40,9 +52,6 @@ def create_subscripts(text):
         subscripts[text[i]] += 1
         subscripted_text.append('{0}-{1}'.format(text[i], subscripts[text[i]]))
     return subscripted_text
-
-def map():
-    pass
 
 if __name__ == '__main__':
     # with open(sys.argv[1]) as genome_fasta:
@@ -61,9 +70,6 @@ if __name__ == '__main__':
 
     dna = 'CGTGATGCGCGGAC$'
 
-    suffix_tree = SuffixTree(len(dna))
-    for char in dna:
-        suffix_tree.add_char(char)
-    # suffix_tree.print_tree()
-    suffix_array = create_suffix_array(suffix_tree)
-    print create_matrices(dna, suffix_array)
+    mapper = Mapper(dna)
+    print mapper.suffix_array
+    print mapper.first_col, mapper.bwt, mapper.ltof
