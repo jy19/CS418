@@ -44,13 +44,17 @@ class Mapper:
         return positions
 
     def map(self, pattern):
+        """find a given pattern in the genome"""
         found_positions = []
         rev_pattern = pattern[::-1]
         current_positions = self.get_position_range(rev_pattern[0], self.first_col, 0, len(self.first_col) - 1)
         for i in range(1, len(rev_pattern)):
             bwt_positions = self.get_position_range(rev_pattern[i], self.bwt, current_positions[0], current_positions[-1])
-            ltof_positions = range(self.ltof[bwt_positions[0]], self.ltof[bwt_positions[-1]] + 1)
-            current_positions = ltof_positions
+            try:
+                ltof_positions = range(self.ltof[bwt_positions[0]], self.ltof[bwt_positions[-1]] + 1)
+                current_positions = ltof_positions
+            except IndexError:
+                print 'Index Error out of range', bwt_positions
         # after last char, push every position in SA to found_positions
         for i in current_positions:
             found_positions.append(self.suffix_array[i])
@@ -79,7 +83,7 @@ if __name__ == '__main__':
         genome_name = genome_fasta.next().strip()[1:]
         dna = ""
         for line in genome_fasta:
-            dna = line.strip().upper()
+            dna += line.strip().upper()
         dna += '$'
 
     with open(sys.argv[2]) as read_fasta:
