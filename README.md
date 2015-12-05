@@ -25,3 +25,8 @@ To output to a SAM file to use with samtools:
 
     python mapper.py genome_file reads_file > file_name.sam
 
+To run the mapping project with errors:
+
+    python mapper.py genome_file reads_file kmer_size
+
+`kmer_size` is the size of the kmer a read will be broken down into for error handling. 
