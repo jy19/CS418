@@ -1,7 +1,11 @@
+from __future__ import print_function
 import sys
 from suffixtree import SuffixTree
 from utils import generate_kmers, create_subscripts
 import threading
+
+# dirty hack for thread safe stdout, so can print as it goes in case program times out
+print = lambda x: sys.stdout.write('%s\n' % x)
 
 class MapThread(threading.Thread):
     def __init__(self, patterns, mapper, dna_name, kmer_size=None):
@@ -17,16 +21,18 @@ class MapThread(threading.Thread):
             for pattern in self.patterns:
                 estimated_position = estimate_position(pattern[0], kmer_size)
                 if estimated_position:
-                    entry = output_to_SAM(estimated_position, pattern[0], pattern[1], self.dna_name)
-                    self.pattern_mappings.append(entry)
+                    # entry = output_to_SAM(estimated_position, pattern[0], pattern[1], self.dna_name)
+                    output_to_SAM(estimated_position, pattern[0], pattern[1], self.dna_name)
+                    # self.pattern_mappings.append(entry)
         else:
             for pattern in self.patterns:
                 positions = mapper.map(pattern[0])
                 positions = [x + 1 for x in positions]
                 if not positions:
                     continue
-                entry = output_to_SAM(positions[0], pattern[0], pattern[1], self.dna_name)
-                self.pattern_mappings.append(entry)
+                # entry = output_to_SAM(positions[0], pattern[0], pattern[1], self.dna_name)
+                output_to_SAM(positions[0], pattern[0], pattern[1], self.dna_name)
+                # self.pattern_mappings.append(entry)
 
 class Mapper:
     def __init__(self, dna):
@@ -115,11 +121,12 @@ def estimate_position(pattern, kmer_size):
 def output_to_SAM(position, pattern, pattern_name, genome_name):
     entry = '{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}'.format(
         pattern_name, 0, genome_name, position, 255, str(len(pattern)) + 'M', '*', 0, 0, pattern.lower(), '*')
-    return entry
+    print(entry)
+    # return entry
 
-def print_all(pattern_mappings):
-    for mapping in pattern_mappings:
-        print mapping
+# def print_all(pattern_mappings):
+#     for mapping in pattern_mappings:
+#         print mapping
 
 if __name__ == '__main__':
     with open(sys.argv[1]) as genome_fasta:
@@ -152,10 +159,13 @@ if __name__ == '__main__':
 
     threads = []
     increments = int(len(patterns)) / thread_count
+
     for i in range(thread_count):
         pattern_range = pattern_tuples[increments*i:increments*(i+1)]
         t = MapThread(pattern_range, mapper, genome_name, kmer_size)
         threads.append(t)
+
+    print('Finished reading files and creating threads.')
 
     for thread in threads:
         thread.start()
@@ -163,5 +173,5 @@ if __name__ == '__main__':
     for thread in threads:
         thread.join()
 
-    for thread in threads:
-        print_all(thread.pattern_mappings)
+    # for thread in threads:
+    #     print_all(thread.pattern_mappings)

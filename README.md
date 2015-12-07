@@ -22,7 +22,7 @@ To run the mapping project:
     python mapper.py genome_file reads_file thread_count
 
 `thread_count` is the number of cores you'd like to run this program on (for speed-up purposes).
-Note: if any of the arguments are missing the program will fail. 
+Note: if any of the arguments are missing the program will fail.
 To output to a SAM file to use with samtools:
 
     python mapper.py genome_file reads_file thread_count > file_name.sam
