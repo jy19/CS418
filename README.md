@@ -19,14 +19,16 @@ To output to a file for easier reading, pipe stdout to file:
 
 To run the mapping project:
 
-    python mapper.py genome_file reads_file
+    python mapper.py genome_file reads_file thread_count
 
+`thread_count` is the number of cores you'd like to run this program on (for speed-up purposes).
+Note: if any of the arguments are missing the program will fail. 
 To output to a SAM file to use with samtools:
 
-    python mapper.py genome_file reads_file > file_name.sam
+    python mapper.py genome_file reads_file thread_count > file_name.sam
 
 To run the mapping project with errors:
 
-    python mapper.py genome_file reads_file kmer_size
+    python mapper.py genome_file reads_file thread_count kmer_size
 
-`kmer_size` is the size of the kmer a read will be broken down into for error handling. 
+`kmer_size` is the size of the kmer a read will be broken down into for error handling.

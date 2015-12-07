@@ -1,6 +1,32 @@
 import sys
 from suffixtree import SuffixTree
 from utils import generate_kmers, create_subscripts
+import threading
+
+class MapThread(threading.Thread):
+    def __init__(self, patterns, mapper, dna_name, kmer_size=None):
+        self.dna_name = dna_name
+        self.mapper = mapper
+        self.patterns = patterns
+        self.pattern_mappings = []
+        self.kmer_size = kmer_size
+        threading.Thread.__init__(self)
+
+    def run(self):
+        if self.kmer_size:
+            for pattern in self.patterns:
+                estimated_position = estimate_position(pattern[0], kmer_size)
+                if estimated_position:
+                    entry = output_to_SAM(estimated_position, pattern[0], pattern[1], self.dna_name)
+                    self.pattern_mappings.append(entry)
+        else:
+            for pattern in self.patterns:
+                positions = mapper.map(pattern[0])
+                positions = [x + 1 for x in positions]
+                if not positions:
+                    continue
+                entry = output_to_SAM(positions[0], pattern[0], pattern[1], self.dna_name)
+                self.pattern_mappings.append(entry)
 
 class Mapper:
     def __init__(self, dna):
@@ -89,8 +115,11 @@ def estimate_position(pattern, kmer_size):
 def output_to_SAM(position, pattern, pattern_name, genome_name):
     entry = '{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}'.format(
         pattern_name, 0, genome_name, position, 255, str(len(pattern)) + 'M', '*', 0, 0, pattern.lower(), '*')
-    print entry
+    return entry
 
+def print_all(pattern_mappings):
+    for mapping in pattern_mappings:
+        print mapping
 
 if __name__ == '__main__':
     with open(sys.argv[1]) as genome_fasta:
@@ -103,27 +132,36 @@ if __name__ == '__main__':
     with open(sys.argv[2]) as read_fasta:
         pattern_names = []
         patterns = []
+        pattern_tuples = []
         for pattern in read_fasta:
             if pattern[0] == ">":
                 pattern_names.append(pattern.strip()[1:])
             else:
                 patterns.append(pattern.strip().upper())
 
-    # todo: possibly map pattern name to pattern and other info
+        for i in range(len(patterns)):
+            pattern_tuples.append((patterns[i], pattern_names[i]))
 
+    thread_count = int(sys.argv[3])
     mapper = Mapper(dna)
 
     try:
-        kmer_size = int(sys.argv[3])
-        for i in range(len(patterns)):
-            estimated_position = estimate_position(patterns[i], kmer_size)
-            if estimated_position:
-                output_to_SAM(estimated_position, patterns[i], pattern_names[i], genome_name)
-
+        kmer_size = int(sys.argv[4])
     except IndexError:
-        for i in range(len(patterns)):
-            positions = mapper.map(patterns[i])
-            positions = [x + 1 for x in positions]
-            if not positions:
-                continue
-            output_to_SAM(positions[0], patterns[i], pattern_names[i], genome_name)
+        kmer_size = None
+
+    threads = []
+    increments = int(len(patterns)) / thread_count
+    for i in range(thread_count):
+        pattern_range = pattern_tuples[increments*i:increments*(i+1)]
+        t = MapThread(pattern_range, mapper, genome_name, kmer_size)
+        threads.append(t)
+
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    for thread in threads:
+        print_all(thread.pattern_mappings)

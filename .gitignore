@@ -6,3 +6,5 @@ contig*
 env/
 *.sam
 *.bam*
+*.bt*
+*.png
