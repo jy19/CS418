@@ -80,7 +80,11 @@ def estimate_position(pattern, kmer_size):
             except KeyError:
                 possible_positions[pos - kmer_offset] = 1
         kmer_offset += 1
-    return max(possible_positions, key=possible_positions.get) + 1
+    try:
+        estimated_position = max(possible_positions, key=possible_positions.get) + 1
+    except ValueError:
+        estimated_position = None
+    return estimated_position
 
 def output_to_SAM(position, pattern, pattern_name, genome_name):
     entry = '{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}'.format(
@@ -113,10 +117,13 @@ if __name__ == '__main__':
         kmer_size = int(sys.argv[3])
         for i in range(len(patterns)):
             estimated_position = estimate_position(patterns[i], kmer_size)
-            output_to_SAM(estimated_position, patterns[i], pattern_names[i], genome_name)
+            if estimated_position:
+                output_to_SAM(estimated_position, patterns[i], pattern_names[i], genome_name)
 
     except IndexError:
         for i in range(len(patterns)):
             positions = mapper.map(patterns[i])
             positions = [x + 1 for x in positions]
+            if not positions:
+                continue
             output_to_SAM(positions[0], patterns[i], pattern_names[i], genome_name)
