@@ -71,11 +71,11 @@ class Mapper:
     def get_position_range(self, char, list_type, start, end):
         """returns range of positions for a char in specified type of list"""
         positions = []
-        for index in range(start, end + 1):
+        for index in xrange(start, end + 1):
             if list_type[index].startswith(char):
                 positions.append(index)
                 break
-        for index in range(end, start, -1):
+        for index in xrange(end, start, -1):
             if list_type[index].startswith(char):
                 positions.append(index)
                 break
@@ -86,7 +86,7 @@ class Mapper:
         found_positions = []
         rev_pattern = pattern[::-1]
         current_positions = self.get_position_range(rev_pattern[0], self.first_col, 0, len(self.first_col) - 1)
-        for i in range(1, len(rev_pattern)):
+        for i in xrange(1, len(rev_pattern)):
             try:
                 bwt_positions = self.get_position_range(rev_pattern[i], self.bwt, current_positions[0],
                                                         current_positions[-1])
@@ -146,7 +146,7 @@ if __name__ == '__main__':
             else:
                 patterns.append(pattern.strip().upper())
 
-        for i in range(len(patterns)):
+        for i in xrange(len(patterns)):
             pattern_tuples.append((patterns[i], pattern_names[i]))
 
     thread_count = int(sys.argv[3])
@@ -160,7 +160,7 @@ if __name__ == '__main__':
     threads = []
     increments = int(len(patterns)) / thread_count
 
-    for i in range(thread_count):
+    for i in xrange(thread_count):
         pattern_range = pattern_tuples[increments*i:increments*(i+1)]
         t = MapThread(pattern_range, mapper, genome_name, kmer_size)
         threads.append(t)
